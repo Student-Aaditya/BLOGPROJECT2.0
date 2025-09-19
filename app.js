@@ -2,9 +2,7 @@ if (process.env.NODE_ENV != "Production") {
     require("dotenv").config();
 }
 
-require("./instrument.js");
 
-const Sentry = require("@sentry/node");
 const express = require("express");
 const path = require("path");
 const app = express();
@@ -23,7 +21,7 @@ const ejsMate = require("ejs-mate");
 const flash = require("connect-flash");
 const MongoStore = require("connect-mongo");
 const dburl = process.env.ATLAS_DB;
-const port = 8020;
+const port = 8023;
 //for different type of blog
 const BLOG = require("./Model/edit.js");
 const TECH=require("./Model/tech,.js");
@@ -60,7 +58,7 @@ main().
         console.log(err);
     })
 async function main() {
-    await mongoose.connect("mongodb://127.0.0.1:27017/blog");
+    await mongoose.connect(process.env.ATLAS_DB);
 
 }
 
@@ -100,7 +98,7 @@ app.post("/sign", async (req, res) => {
         let { username, email, password } = req.body;
         const newuser = new User({ username, email });
         const regis = await User.register(newuser, password);
-        res.redirect("/home");
+        res.redirect("/");
         sms(username);
     } catch (err) {
         console.error(err);
@@ -113,7 +111,7 @@ app.get("/login", (req, res) => {
 
 app.post("/login", passport.authenticate("local", { failureRedirect: "/login", failureFlash: true }), async (req, res) => {
     req.flash("sucess","login sucessful");
-    res.redirect("/home");
+    res.redirect("/");
 })
 
 app.get("/logout", (req, res) => {
@@ -122,7 +120,7 @@ app.get("/logout", (req, res) => {
             if (err) {
                 nextTick(err);
             }
-            res.redirect("/home");
+            res.redirect("/");
         })
     }
     catch (err) {
@@ -455,10 +453,7 @@ app.get("/About", (req, res) => {
     res.render("HOME/About.ejs");
 })
 
-Sentry.setupExpressErrorHandler(app);
-app.get("/debug-sentry", function mainHandler(req, res) {
-  throw new Error("My first Sentry error!");
-});
+
 
 
 app.listen(port, (req, res) => {
