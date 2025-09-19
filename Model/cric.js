@@ -1,10 +1,8 @@
 const mongoose=require("mongoose");
-// const { type } = require("os");
 
 const CricSchema=new mongoose.Schema({
     Title:{
         type:String,
-        // required:true,
     },
     Content:{
         type:String,
